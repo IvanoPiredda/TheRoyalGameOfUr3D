@@ -7,6 +7,14 @@ public class StoneStorage : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		
+        InstantiateStonePrefab();
+	}
+
+    public GameObject StonePrefab;
+    public Tile StartingTile;
+
+    public void InstantiateStonePrefab()
+    {
         // Create one stone for each placeholder spot
 
         for (int i = 0; i < this.transform.childCount; i++)
@@ -18,12 +26,7 @@ public class StoneStorage : MonoBehaviour {
 
             AddStoneToStorage(theStone , this.transform.GetChild(i) );
         }
-
-	}
-
-    public GameObject StonePrefab;
-    public Tile StartingTile;
-
+    }
 
     public void AddStoneToStorage( GameObject theStone, Transform thePlaceholder=null )
     {

@@ -8,18 +8,24 @@ public class StateManager : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        PlayerAIs = new AIPlayer[NumberOfPlayers];
+        //PlayerAIs = new AIPlayer[NumberOfPlayers];
+        //PlayerAIs = new RLAgent[NumberOfPlayers];
 
-        PlayerAIs[0] = null;    // Is a human player
+        //PlayerAIs[0] = null;    // Is a human player
         //PlayerAIs[0] = new AIPlayer_UtilityAI();
-        PlayerAIs[1] = new AIPlayer_UtilityAI();
+        //PlayerAIs[1] = new AIPlayer_UtilityAI();
+        //PlayerAIs[1] = new RLAgent();
     }
 
     public int NumberOfPlayers = 2;
     public int CurrentPlayerId = 0;
+    public int[] PlayerScores = new int[2];
+    public int[] PlayersWins = new int[2];
 
-    AIPlayer[] PlayerAIs;
+    public int WinState = -1; // -1 means no winner yet, otherwise it will be the playerId of the winner (0 or 1 in a 2 player game)
 
+    //AIPlayer[] PlayerAIs;
+    [SerializeField] public RLAgent[] PlayerAIs;
     public int DiceTotal;
 
     // NOTE: enum / statemachine is probably a stronger choice, but I'm aiming for simpler to explain.
@@ -53,7 +59,31 @@ public class StateManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-		
+		// Check if we have a winner
+        for(int i=0; i<NumberOfPlayers; i++)
+        {
+            if(PlayerScores[i] >= 6)
+            {
+                if (IsDoneRolling && IsDoneClicking && AnimationsPlaying==0)
+                {
+                    Debug.Log("Player " + i + " wins!");
+                    WinState = i;
+                    PlayersWins[i]++;
+                    Debug.Log("The score is now Player 1: " + PlayersWins[0] + " wins, Player 2: " + PlayersWins[1] + " wins.");
+                    PlayerScores = new int[2] { 0, 0 }; // Reset scores for next game
+                    //PlayerAIs[CurrentPlayerId].SetReward(1.0f);
+                    //PlayerAIs[(CurrentPlayerId + 1) % NumberOfPlayers].SetReward(-1f);
+                    //PlayerAIs[CurrentPlayerId].ResetGame();
+                    //PlayerAIs[(CurrentPlayerId + 1) % NumberOfPlayers].ResetGame();
+                    
+                    PlayerAIs[CurrentPlayerId].EndEpisode();
+                    PlayerAIs[(CurrentPlayerId + 1) % NumberOfPlayers].EndEpisode();
+                    
+                    return;
+                }
+                
+            }
+        }
         // Is the turn done?
         if (IsDoneRolling && IsDoneClicking && AnimationsPlaying==0)
         {
@@ -62,7 +92,7 @@ public class StateManager : MonoBehaviour
             return;
         }
 
-        if( PlayerAIs[CurrentPlayerId] != null )
+        if( PlayerAIs[CurrentPlayerId] != null &&  PlayerAIs[CurrentPlayerId].isMoving == false)
         {
             PlayerAIs[CurrentPlayerId].DoAI();
         }

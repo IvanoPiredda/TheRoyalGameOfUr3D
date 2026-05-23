@@ -12,12 +12,12 @@ public class PlayerStone : MonoBehaviour
     }
 
     public Tile StartingTile;
-    public Tile CurrentTile { get; protected set; }
+    public Tile CurrentTile { get; set; }
 
     public int PlayerId;
     public StoneStorage MyStoneStorage;
 
-    bool scoreMe = false;
+    public bool scoreMe = false;
 
     StateManager theStateManager;
 
@@ -70,6 +70,7 @@ public class PlayerStone : MonoBehaviour
                     stoneToBop.ReturnToStorage();
                     stoneToBop = null;
                 }
+                
             }
             else
             {
@@ -95,6 +96,8 @@ public class PlayerStone : MonoBehaviour
                 ref velocity, 
                 smoothTime);
         }
+
+        
 
     }
 
@@ -178,10 +181,12 @@ public class PlayerStone : MonoBehaviour
 
         // TODO: Check to see if the destination is legal!
 
-        if(finalTile == null)
+        if(finalTile == null || finalTile.IsScoringSpace == true)
         {
             // Hey, we're scoring this stone!
+            theStateManager.PlayerScores[PlayerId]++;
             scoreMe = true;
+            Debug.Log("Player " + PlayerId + " scored!  Score is now: " + theStateManager.PlayerScores[PlayerId]);
         }
         else
         {
@@ -193,7 +198,7 @@ public class PlayerStone : MonoBehaviour
                 return;
             }
 
-            // If there is an enemy tile in our legal space, the we kick it out.
+            // If there is an enemy tile in our legal space, then we kick it out.
             if(finalTile.PlayerStone != null)
             {
                 //finalTile.PlayerStone.ReturnToStorage();
