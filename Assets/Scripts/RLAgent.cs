@@ -96,8 +96,6 @@ public class RLAgent : Agent
     virtual protected void DoClick(int index)
     {
         // Pick a stone to move, then "click" it.
-
-
         PlayerStone[] legalStones = GetLegalMoves();
 
         if(legalStones == null || legalStones.Length == 0)
@@ -109,7 +107,36 @@ public class RLAgent : Agent
         }
 
         PlayerStone pickedStone = legalStones[index % legalStones.Length];
+        Tile currentTile = pickedStone.CurrentTile;
+        Tile futureTile = pickedStone.GetTileAhead(stateManager.DiceTotal);
         AddReward(-0.01f); // Small negative reward for each click to encourage shorter games
+
+        if (currentTile != null && currentTile.IsRollAgain == true)
+        {
+            AddReward(0.05f); // Small positive reward for staying on a roll again tile
+        }
+        if (currentTile != null && currentTile.IsSideline == true)
+        {
+            AddReward(0.05f); // Small positive reward for being on a safe tile
+        }
+        if (futureTile != null && futureTile.IsScoringSpace == true)
+        {
+            AddReward(0.15f); // Small positive reward for moving onto a scoring tile
+        }
+        if (futureTile != null && futureTile.PlayerStone != null && futureTile.PlayerStone.PlayerId != pickedStone.PlayerId)
+        {
+            AddReward(0.10f); // Small positive reward for knocking an opponent's stone off
+            stateManager.PlayerAIs[futureTile.PlayerStone.PlayerId].AddReward(-0.10f); // Small negative reward for the opponent losing a stone
+        }
+        if (futureTile != null && futureTile.IsRollAgain == true)
+        {
+            AddReward(0.05f); // Small positive reward for moving onto a roll again tile
+        }
+        if (futureTile != null && futureTile.IsSideline == true)
+        {
+            AddReward(0.05f); // Small positive reward for moving onto a safe tile
+        }
+
 
         pickedStone.MoveMe();
         if (stateManager.PlayerScores[stateManager.CurrentPlayerId] >= 6)

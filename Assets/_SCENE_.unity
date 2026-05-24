@@ -912,6 +912,7 @@ MonoBehaviour:
   NumberOfPlayers: 2
   CurrentPlayerId: 0
   PlayerScores: 0000000000000000
+  PlayersWins: 0000000000000000
   WinState: 0
   PlayerAIs:
   - {fileID: 212690011}
@@ -4400,6 +4401,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: AIPlayer2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5180477384776257248, guid: 4f84fb7cbaaef4a4fb7a80af80df250b,
+        type: 3}
+      propertyPath: m_Model
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 5180477384776257248, guid: 4f84fb7cbaaef4a4fb7a80af80df250b,
+        type: 3}
+      propertyPath: m_BehaviorType
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6912143014755540595, guid: 4f84fb7cbaaef4a4fb7a80af80df250b,
         type: 3}
