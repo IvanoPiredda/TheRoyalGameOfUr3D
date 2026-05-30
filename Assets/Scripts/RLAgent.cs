@@ -4,6 +4,8 @@ using Unity.MLAgents.Actuators;
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using UnityEditor;
 
 public class RLAgent : Agent
 {
@@ -33,24 +35,69 @@ public class RLAgent : Agent
 
     public override void CollectObservations(VectorSensor sensor)
     {
-        // Collect observations about the game state here. We have a total of 34/36 observations we can make:
+        // Collect observations about the game state here. We have a total of 25 observations we can make:
 
-        PlayerStone[] pss = GameObject.FindObjectsOfType<PlayerStone>(); // 12 stones in total
+        PlayerStone[] pss = Object.FindObjectsByType<PlayerStone>(FindObjectsSortMode.None);
 
-        foreach( PlayerStone ps in pss )
+        float myStonesInStorage = 0f;
+        float myStonesInGoal = 0f;
+        float opponentStonesInStorage = 0f;
+        float opponentStonesInGoal = 0f;
+
+        int myPlayerId = stateManager.CurrentPlayerId;
+
+        foreach( PlayerStone ps in pss.OrderBy(ps => ps.PlayerId).ThenBy(ps => ps.StoneId) )
         {
-            sensor.AddObservation(ps); 
+            if (ps.PlayerId == myPlayerId)
+            {
+                if (ps.CurrentTile == ps.StartingTile)
+                {
+                    myStonesInStorage += 1f;
+                }
+                else if (ps.scoreMe == true)
+                {
+                    myStonesInGoal += 1f;
+                }
+            }
+            else
+            {
+                if (ps.CurrentTile == ps.StartingTile)
+                {
+                    opponentStonesInStorage += 1f;
+                }
+                else if (ps.scoreMe == true)
+                {
+                    opponentStonesInGoal += 1f;
+                }
+            }
         }
 
-        Tile[] tiles = GameObject.FindObjectsOfType<Tile>(); // 20 tiles in total
+        sensor.AddObservation(myStonesInStorage / 6.0f); // 1 for the number of my stones still in the storage
+        sensor.AddObservation(myStonesInGoal / 6.0f); // 1 for the number of stones in goal
+        sensor.AddObservation(opponentStonesInStorage / 6.0f); // 1 for the number of opponent's stones still in the storage
+        sensor.AddObservation(opponentStonesInGoal / 6.0f); // 1 for the number of opponent's stones in goal
 
-        foreach( Tile t in tiles )
+        Tile[] tiles = Object.FindObjectsByType<Tile>(FindObjectsSortMode.None); // 20 tiles in total 
+        foreach( Tile t in tiles.OrderBy(t => t.TileId) )
         {
-            sensor.AddObservation(t);
+            if (t.PlayerStone != null)
+            {
+                if (t.PlayerStone.PlayerId == myPlayerId)
+                {
+                    sensor.AddObservation(1.0f); // My stone
+                }
+                else
+                {
+                    sensor.AddObservation(-1.0f); // Opponent's stone
+                }
+            }
+            else
+            {
+                sensor.AddObservation(0.0f); // No stone on this tile
+            }
         }
 
-        sensor.AddObservation(stateManager.CurrentPlayerId);
-        sensor.AddObservation(stateManager.DiceTotal);
+        sensor.AddObservation(stateManager.DiceTotal / 4.0f); // Normalize dice total to be between 0 and 1
     }
 
     public void DoAI()
@@ -64,10 +111,9 @@ public class RLAgent : Agent
         
         if(stateManager.IsDoneRolling == false)
         {
-            // We need to roll the dice!
-            DoRoll();
             return;
         }
+        
 
         // Interpret the actions and apply them to the game here
         
@@ -88,45 +134,35 @@ public class RLAgent : Agent
         // For example, you could give a positive reward for moving a stone closer to the goal and a negative reward for moving it further away
     }
 
-    virtual protected void DoRoll()
-    {
-        diceRoller.RollTheDice();
-    }
-
     virtual protected void DoClick(int index)
     {
         // Pick a stone to move, then "click" it.
-        PlayerStone[] legalStones = GetLegalMoves();
+        //PlayerStone[] legalStones = GetLegalMoves();
+        PlayerStone[] playerStones = Object.FindObjectsByType<PlayerStone>(FindObjectsSortMode.None);
+        PlayerStone[] myStones = playerStones.Where(ps => ps.PlayerId == stateManager.CurrentPlayerId).OrderBy(ps => ps.StoneId).ToArray();
 
-        if(legalStones == null || legalStones.Length == 0)
-        {
-            // We have no legal moves.  How did we get here?
-            // We might still be in a delayed coroutine somewhere. Let's not freak out.
-            Debug.Log("Trying to click a stone but we have no legal moves. This might be because we're still waiting for a coroutine to finish. Ignoring this click.");
-            return;
-        }
 
-        PlayerStone pickedStone = legalStones[index % legalStones.Length];
+        PlayerStone pickedStone = myStones[index];
         Tile currentTile = pickedStone.CurrentTile;
         Tile futureTile = pickedStone.GetTileAhead(stateManager.DiceTotal);
-        AddReward(-0.01f); // Small negative reward for each click to encourage shorter games
+        AddReward(-0.005f); // Small negative reward for each click to encourage shorter games
 
         if (currentTile != null && currentTile.IsRollAgain == true)
         {
-            AddReward(0.05f); // Small positive reward for staying on a roll again tile
+            AddReward(0.01f); // Small positive reward for staying on a roll again tile
         }
         if (currentTile != null && currentTile.IsSideline == true)
         {
-            AddReward(0.05f); // Small positive reward for being on a safe tile
+            AddReward(0.01f); // Small positive reward for being on a safe tile
         }
         if (futureTile != null && futureTile.IsScoringSpace == true)
         {
-            AddReward(0.15f); // Small positive reward for moving onto a scoring tile
+            AddReward(0.4f); // Small positive reward for moving onto a scoring tile
         }
         if (futureTile != null && futureTile.PlayerStone != null && futureTile.PlayerStone.PlayerId != pickedStone.PlayerId)
         {
-            AddReward(0.10f); // Small positive reward for knocking an opponent's stone off
-            stateManager.PlayerAIs[futureTile.PlayerStone.PlayerId].AddReward(-0.10f); // Small negative reward for the opponent losing a stone
+            AddReward(0.2f); // Small positive reward for knocking an opponent's stone off
+            //stateManager.PlayerAIs[futureTile.PlayerStone.PlayerId].AddReward(-0.10f); // Small negative reward for the opponent losing a stone
         }
         if (futureTile != null && futureTile.IsRollAgain == true)
         {
@@ -134,16 +170,19 @@ public class RLAgent : Agent
         }
         if (futureTile != null && futureTile.IsSideline == true)
         {
-            AddReward(0.05f); // Small positive reward for moving onto a safe tile
+            AddReward(0.01f); // Small positive reward for moving onto a safe tile
         }
 
 
         pickedStone.MoveMe();
+        /*
+        // Check if we won the game!
         if (stateManager.PlayerScores[stateManager.CurrentPlayerId] >= 6)
         {
             AddReward(1.0f); // Big reward for winning the game
             stateManager.PlayerAIs[(stateManager.CurrentPlayerId + 1) % stateManager.NumberOfPlayers].AddReward(-1.0f); // Big negative reward for the opponent losing
         }
+        */
     }
 
     /// <summary>
@@ -175,6 +214,30 @@ public class RLAgent : Agent
         }
         Debug.Log("Legal Stones: " + legalStones.ToArray());
         return legalStones.ToArray();
+    }
+
+    public override void WriteDiscreteActionMask(IDiscreteActionMask actionMask)
+    {
+        // If we have rolled the dice but haven't clicked a stone yet, then we need to mask out any illegal stone clicks.
+        if(stateManager.IsDoneClicking == false && stateManager.IsDoneRolling == true)
+        {
+            PlayerStone[] playerStones = Object.FindObjectsByType<PlayerStone>(FindObjectsSortMode.None);
+            //playerStones = playerStones.OrderBy(ps => ps.PlayerId).ThenBy(ps => ps.StoneId).ToArray();
+            //PlayerStone[] legalStones = GetLegalMoves();
+            PlayerStone[] myStones = playerStones.Where(ps => ps.PlayerId == stateManager.CurrentPlayerId).OrderBy(ps => ps.StoneId).ToArray();
+
+            for(int i=0; i<6; i++)
+            {
+                if(myStones[i].CanLegallyMoveAhead(stateManager.DiceTotal) == false)
+                {
+                    actionMask.SetActionEnabled(0, i, false);
+                }
+                else
+                {
+                    actionMask.SetActionEnabled(0, i, true);
+                }
+            }
+        }
     }
 
     public override void Heuristic(in ActionBuffers actionsOut)

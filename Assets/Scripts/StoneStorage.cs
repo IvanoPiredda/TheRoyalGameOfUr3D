@@ -23,6 +23,7 @@ public class StoneStorage : MonoBehaviour {
             GameObject theStone = Instantiate( StonePrefab );
             theStone.GetComponent<PlayerStone>().StartingTile = this.StartingTile;
             theStone.GetComponent<PlayerStone>().MyStoneStorage = this;
+            theStone.GetComponent<PlayerStone>().StoneId = i;
 
             AddStoneToStorage(theStone , this.transform.GetChild(i) );
         }

@@ -1,0 +1,66 @@
+{
+    "RLAgent": {
+        "checkpoints": [
+            {
+                "steps": 1399954,
+                "file_path": "results/test07/RLAgent/RLAgent-1399954.onnx",
+                "reward": 3.7966665904968977,
+                "creation_time": 1779816654.675801,
+                "auxillary_file_paths": [
+                    "results/test07/RLAgent/RLAgent-1399954.pt"
+                ]
+            },
+            {
+                "steps": 1599955,
+                "file_path": "results/test07/RLAgent/RLAgent-1599955.onnx",
+                "reward": 4.438333262999852,
+                "creation_time": 1779817211.150919,
+                "auxillary_file_paths": [
+                    "results/test07/RLAgent/RLAgent-1599955.pt"
+                ]
+            },
+            {
+                "steps": 1799983,
+                "file_path": "results/test07/RLAgent/RLAgent-1799983.onnx",
+                "reward": 4.13499993365258,
+                "creation_time": 1779817775.781676,
+                "auxillary_file_paths": [
+                    "results/test07/RLAgent/RLAgent-1799983.pt"
+                ]
+            },
+            {
+                "steps": 1999942,
+                "file_path": "results/test07/RLAgent/RLAgent-1999942.onnx",
+                "reward": null,
+                "creation_time": 1779818337.6503968,
+                "auxillary_file_paths": [
+                    "results/test07/RLAgent/RLAgent-1999942.pt"
+                ]
+            },
+            {
+                "steps": 2000006,
+                "file_path": "results/test07/RLAgent/RLAgent-2000006.onnx",
+                "reward": null,
+                "creation_time": 1779818337.664605,
+                "auxillary_file_paths": [
+                    "results/test07/RLAgent/RLAgent-2000006.pt"
+                ]
+            }
+        ],
+        "elo": 558.4341001633494,
+        "final_checkpoint": {
+            "steps": 2000006,
+            "file_path": "results/test07/RLAgent.onnx",
+            "reward": null,
+            "creation_time": 1779818337.664605,
+            "auxillary_file_paths": [
+                "results/test07/RLAgent/RLAgent-2000006.pt"
+            ]
+        }
+    },
+    "metadata": {
+        "stats_format_version": "0.3.0",
+        "mlagents_version": "1.1.0",
+        "torch_version": "2.0.1"
+    }
+}

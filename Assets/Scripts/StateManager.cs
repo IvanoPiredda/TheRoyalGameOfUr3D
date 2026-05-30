@@ -26,6 +26,8 @@ public class StateManager : MonoBehaviour
 
     //AIPlayer[] PlayerAIs;
     [SerializeField] public RLAgent[] PlayerAIs;
+
+    public DiceRoller diceRoller;
     public int DiceTotal;
 
     // NOTE: enum / statemachine is probably a stronger choice, but I'm aiming for simpler to explain.
@@ -71,13 +73,13 @@ public class StateManager : MonoBehaviour
                     PlayersWins[i]++;
                     Debug.Log("The score is now Player 1: " + PlayersWins[0] + " wins, Player 2: " + PlayersWins[1] + " wins.");
                     PlayerScores = new int[2] { 0, 0 }; // Reset scores for next game
-                    //PlayerAIs[CurrentPlayerId].SetReward(1.0f);
-                    //PlayerAIs[(CurrentPlayerId + 1) % NumberOfPlayers].SetReward(-1f);
+                    PlayerAIs[i].SetReward(1.0f);
+                    PlayerAIs[(i + 1) % NumberOfPlayers].SetReward(-1.0f);
                     //PlayerAIs[CurrentPlayerId].ResetGame();
                     //PlayerAIs[(CurrentPlayerId + 1) % NumberOfPlayers].ResetGame();
                     
-                    PlayerAIs[CurrentPlayerId].EndEpisode();
-                    PlayerAIs[(CurrentPlayerId + 1) % NumberOfPlayers].EndEpisode();
+                    PlayerAIs[i].EndEpisode();
+                    PlayerAIs[(i + 1) % NumberOfPlayers].EndEpisode();
                     
                     return;
                 }
@@ -90,6 +92,11 @@ public class StateManager : MonoBehaviour
             Debug.Log("Turn is done!");
             NewTurn();
             return;
+        }
+
+        if (IsDoneRolling == false)
+        {
+            diceRoller.RollTheDice();
         }
 
         if( PlayerAIs[CurrentPlayerId] != null &&  PlayerAIs[CurrentPlayerId].isMoving == false)

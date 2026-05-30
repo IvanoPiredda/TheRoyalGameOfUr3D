@@ -11,6 +11,7 @@ public class Tile : MonoBehaviour
     {
     }
 
+    public int TileId; // 0-19 for the 20 tiles on the board, -1 for the "off board" tile that stones start on
     public Tile[] NextTiles;
     public PlayerStone PlayerStone;
     public bool IsScoringSpace;

@@ -1,0 +1,66 @@
+{
+    "RLAgent": {
+        "checkpoints": [
+            {
+                "steps": 4399985,
+                "file_path": "results/test06/RLAgent/RLAgent-4399985.onnx",
+                "reward": 4.95333323131005,
+                "creation_time": 1779801935.0270422,
+                "auxillary_file_paths": [
+                    "results/test06/RLAgent/RLAgent-4399985.pt"
+                ]
+            },
+            {
+                "steps": 4599983,
+                "file_path": "results/test06/RLAgent/RLAgent-4599983.onnx",
+                "reward": 4.513333309441805,
+                "creation_time": 1779802528.414338,
+                "auxillary_file_paths": [
+                    "results/test06/RLAgent/RLAgent-4599983.pt"
+                ]
+            },
+            {
+                "steps": 4799967,
+                "file_path": "results/test06/RLAgent/RLAgent-4799967.onnx",
+                "reward": 4.099999989382923,
+                "creation_time": 1779803119.754143,
+                "auxillary_file_paths": [
+                    "results/test06/RLAgent/RLAgent-4799967.pt"
+                ]
+            },
+            {
+                "steps": 4999977,
+                "file_path": "results/test06/RLAgent/RLAgent-4999977.onnx",
+                "reward": 5.529999949038029,
+                "creation_time": 1779803709.614115,
+                "auxillary_file_paths": [
+                    "results/test06/RLAgent/RLAgent-4999977.pt"
+                ]
+            },
+            {
+                "steps": 5000041,
+                "file_path": "results/test06/RLAgent/RLAgent-5000041.onnx",
+                "reward": 5.529999949038029,
+                "creation_time": 1779803709.629364,
+                "auxillary_file_paths": [
+                    "results/test06/RLAgent/RLAgent-5000041.pt"
+                ]
+            }
+        ],
+        "elo": -105.77723392107997,
+        "final_checkpoint": {
+            "steps": 5000041,
+            "file_path": "results/test06/RLAgent.onnx",
+            "reward": 5.529999949038029,
+            "creation_time": 1779803709.629364,
+            "auxillary_file_paths": [
+                "results/test06/RLAgent/RLAgent-5000041.pt"
+            ]
+        }
+    },
+    "metadata": {
+        "stats_format_version": "0.3.0",
+        "mlagents_version": "1.1.0",
+        "torch_version": "2.0.1"
+    }
+}

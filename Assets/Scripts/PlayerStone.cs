@@ -14,6 +14,8 @@ public class PlayerStone : MonoBehaviour
     public Tile StartingTile;
     public Tile CurrentTile { get; set; }
 
+    public int StoneId; // 0-5 for each player's stones
+
     public int PlayerId;
     public StoneStorage MyStoneStorage;
 
@@ -303,6 +305,11 @@ public class PlayerStone : MonoBehaviour
             // This stone is already on a scoring tile, so we can't move.
             return false;
         }
+        if (scoreMe == true)
+        {
+            // This stone has already scored, so we can't move it.
+            return false;
+        }
 
         Tile theTile = GetTileAhead( spacesToMove );
 
@@ -372,5 +379,7 @@ public class PlayerStone : MonoBehaviour
         // Restore our saved position
         this.transform.position = savePosition;
     }
+
+    
 
 }
